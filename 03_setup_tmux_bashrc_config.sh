@@ -4,9 +4,9 @@ set -euo pipefail
 fileTmuxBashrcConfig="$HOME/.tmux_bashrc_config"
 fileBashrc="$HOME/.bashrc"
 
-echo "---------------------------------------"
-echo "Configure designated tmux nesting level"
-echo "---------------------------------------"
+echo "###############################"
+echo "3. Configure tmux nesting level"
+echo "###############################"
 echo
 echo "0 = normal / outer tmux session"
 echo "1 = first nested tmux session"

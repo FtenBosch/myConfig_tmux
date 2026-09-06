@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-echo "---------------------------------"
+echo "#################################"
 echo "1. Installing tmux configuration:"
-echo "---------------------------------"
+echo "#################################"
+echo
 
 # get git Repo dir independently from cwd
 vcRepoDir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"

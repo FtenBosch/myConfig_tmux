@@ -7,9 +7,10 @@ if ! command -v git >/dev/null 2>&1; then
     exit 1
 fi
 
-echo "---------------------------"
-echo "1. Checking/installing TPM:"
-echo "---------------------------"
+echo "###########################"
+echo "2. Checking/installing TPM:"
+echo "###########################"
+echo
 
 mkdir -v -p "$HOME/.tmux/plugins"
 
