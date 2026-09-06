@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 
 # Exit immediately if a command exits with a non-zero status
 set -e
@@ -7,6 +8,15 @@ echo "########################"
 echo "4. Installing fuzzy-find"
 echo "########################"
 echo 
+
+echo "🔍 Checking fzf installation status"
+if command -v fzf >/dev/null 2>&1; then
+    echo "fzf already installed: $(fzf --version)"
+    exit 0
+else
+    echo "fzf is not installed."
+fi
+
 echo "🔍 Detecting system package manager..."
 
 # Check for apt (Ubuntu, Debian, Mint)
@@ -23,7 +33,7 @@ elif command -v dnf &> /dev/null; then
 # Check for pacman (Arch Linux, Manjaro)
 elif command -v pacman &> /dev/null; then
     echo "📦 Detected Arch-based system (pacman)."
-    sudo pacman -Syu --noconfirm fzf
+    sudo pacman -S --noconfirm fzf
 
 # Check for zypper (openSUSE)
 elif command -v zypper &> /dev/null; then
@@ -42,7 +52,7 @@ else
 
     # Clone fzf official repository and run the install script
     if [ ! -d "$HOME/.fzf" ]; then
-        git clone --depth 1 https://github.com "$HOME/.fzf"
+        git clone --depth 1 https://github.com/junegunn/fzf.git "$HOME/.fzf"
     fi
     "$HOME/.fzf/install" --all
 fi

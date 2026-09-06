@@ -1,0 +1,38 @@
+# tmux bash configuration
+
+# bash environment variable: tmux nesting level (can be 0/1/2)
+export TMUX_NESTING_LEVEL=0
+
+# bash shell function to quickly resurrect a named session
+doTmuxUp() {
+  local vcSessionName="$1"
+  [ -z "$vcSessionName" ] && { echo "usage: doTmuxUp <Name>"; return 1; }
+
+  # If a server/socket with sessions is already up, attach.
+  if tmux -L "$vcSessionName" list-sessions >/dev/null 2>&1; then
+    tmux -L "$vcSessionName" attach
+    return
+  fi
+
+  # Start server by creating a detached bootstrap session (keeps server alive).
+  tmux -L "$vcSessionName" new-session -d -s "$vcSessionName" -n bootstrap
+
+  local vcResurrectDir="$HOME/.tmux/resurrect"
+  local vcResurrectFilePath="$vcResurrectDir/$vcSessionName"
+
+  if [ -f "$vcResurrectFilePath" ]; then
+    echo "Resurrect file exists: $vcResurrectFilePath"
+    ln -sfn -- "$vcResurrectFilePath" "$vcResurrectDir/last"
+    # Run restore into this server/socket
+    tmux -L "$vcSessionName" run-shell "$HOME/.tmux/plugins/tmux-resurrect/scripts/restore.sh"
+    # After restore, kill the bootstrap window if it’s still around
+    tmux -L "$vcSessionName" list-windows -t "$vcSessionName" -F '#W' 2>/dev/null | grep -qx bootstrap && \
+    tmux -L "$vcSessionName" kill-window -t "$vcSessionName:bootstrap"
+  else
+    # if no resurrect file exists, rename the "bootstrap" pane so it will look like a normal freshly started tmux (which has the shell as its name)
+    tmux -L "$vcSessionName" rename-window -t "$vcSessionName:bootstrap" $0
+  fi
+
+  tmux -L "$vcSessionName" attach
+}
+

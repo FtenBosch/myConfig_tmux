@@ -1,0 +1,80 @@
+flowchart TD
+    nodeUserSave("User presses\n&lt;leaderkey&gt; Ctrl-s") --> nodeOpenPrompt("tmux opens 'Save name:' prompt")
+
+    nodeOpenPrompt -.- notePrefillSessionName["Current tmux session name is pre-filled"]
+    nodeOpenPrompt --> nodeEnterSnapshotName("User confirms or enters snapshot name")
+
+    nodeEnterSnapshotName --> xorSnapshotNameValid{"Valid snapshot name?"}
+
+    xorSnapshotNameValid -- No --> nodeRejectSnapshotName("Reject name<br/>Allowed: letters, digits, . _ -")
+    xorSnapshotNameValid -- Yes --> nodeRunWrapper("Run\ntmux_named_resurrect_save.sh")
+
+    nodeRunWrapper --> nodeCallSaveScript("Call\ntmux-resurrect save.sh")
+    nodeCallSaveScript --> nodeSaveTmuxState("tmux-resurrect\nsaves current\ntmux state")
+
+    nodeSaveTmuxState --> nodeUpdateLastSymlink("tmux-resurrect updates<br/>~/.tmux/resurrect/last")
+
+    nodeUpdateLastSymlink --> nodeCopyNamedSnapshot("Copy snapshot referenced by 'last'<br/>to the chosen named snapshot")
+
+    nodeCopyNamedSnapshot --> xorNamedSnapshotExists{"Named snapshot<br/>already exists?"}
+    xorNamedSnapshotExists -- Yes --> nodeOverwriteNamedSnapshot("Overwrite existing named snapshot")
+    xorNamedSnapshotExists -- No --> nodeCreateNamedSnapshot("Create new named snapshot")
+
+    nodeOverwriteNamedSnapshot --> nodeNamedSnapshotSaved("Named snapshot saved")
+    nodeCreateNamedSnapshot --> nodeNamedSnapshotSaved
+
+    nodeNamedSnapshotSaved --> nodeExampleSnapshot[["Example:<br/>~/.tmux/resurrect/Work"]]
+
+    nodeSaveTmuxState -. "automatic snapshots remain<br/>managed by tmux-resurrect" .-> nodeAutomaticSnapshot[["tmux_resurrect_YYYYMMDDTHHMMSS.txt"]]
+
+    %% Name of tmux session
+    nameSession["Name of the\ntmux session"] -.- nodeEnterSnapshotName
+    nameSession -.- nodeRejectSnapshotName 
+    nameSession -.- xorSnapshotNameValid 
+    nameSession -.- nodeCopyNamedSnapshot
+    nameSession -.- nodeNamedSnapshotSaved
+
+    %% Ownership notes
+    noteOriginalTmuxResurrect["Original tmux-resurrect plugin"]
+    
+    %% Activities belonging to original tmux-resurrect
+    noteOriginalTmuxResurrect -.- nodeSaveTmuxState
+    noteOriginalTmuxResurrect -.- nodeUpdateLastSymlink
+    noteOriginalTmuxResurrect -.- nodeCallSaveScript
+
+    %% Class Definitons in color palette "Catppuccin Mocha"
+    classDef activity fill:#a6e3a1, stroke:#94e2d5, color:#11111b, stroke-width:2px
+    classDef file fill:#f9e2af, stroke:#fab387, color:#11111b, stroke-width:2px
+    classDef decision fill:#cba6f7, stroke:#b4befe, color:#11111b, stroke-width:2px
+    classDef note fill:#313244, stroke:#89b4fa, color:#cdd6f4, stroke-width:1px
+    classDef name fill:#89b4fa, stroke:#74c7ec, color:#11111b, stroke-width:2px
+   
+    classDef lightGrey fill:#a6adc8, stroke:#9399b2, color:#11111b, stroke-width:2px
+
+    %% Activities
+    class nodeCallSaveScript activity
+    class nodeCopyNamedSnapshot activity
+    class nodeCreateNamedSnapshot activity
+    class nodeEnterSnapshotName activity
+    class nodeNamedSnapshotSaved activity
+    class nodeOpenPrompt activity
+    class nodeOverwriteNamedSnapshot activity
+    class nodeRejectSnapshotName activity
+    class nodeRunWrapper activity
+    class nodeSaveTmuxState activity
+    class nodeUpdateLastSymlink activity
+    class nodeUserSave activity
+
+    %% Decisions
+    class xorSnapshotNameValid,xorNamedSnapshotExists decision
+
+    %% Files
+    class nodeExampleSnapshot,nodeAutomaticSnapshot file
+
+    %% Notes
+    class noteOriginalTmuxResurrect note
+    class notePersonalAdditions note
+    class notePrefillSessionName note
+
+    %% Name
+    class nameSession name

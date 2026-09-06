@@ -47,8 +47,6 @@ else
 fi
 
 echo "--------------------------------------------"
-echo "2. Reload config file using <leaderkey>r"
-echo "--------------------------------------------"
-echo "3. then press I (capital i) to fetch plugins"
+echo "TPM Setup completed."
 echo "--------------------------------------------"
 

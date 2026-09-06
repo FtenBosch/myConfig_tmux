@@ -9,13 +9,13 @@ pathTmuxResurrect="${pathTmuxResurrect/#\~/$HOME}"
 
 # 1) prerequisites
 if ! command -v fzf >/dev/null 2>&1; then
-  echo "fzf not found (try: sudo dnf install fzf)"; read -n1 -s -r -p "Close"; echo; exit 0
+  echo "fzf not found. Run 04_install_fuzzyfind.sh first."; read -n1 -s -r -p "Close"; echo; exit 0
 fi
 if [[ ! -d "${pathTmuxResurrect}" ]]; then
   echo "No resurrect directory at: ${pathTmuxResurrect}"; read -n1 -s -r -p "Close"; echo; exit 0
 fi
 
-# 2) choose *absolute* path (exclude the rolling 'last')
+# 2) choose snapshot filename (exclude the rolling 'last')
 nameSelectedSnapshot="$(
   cd -- "${pathTmuxResurrect}"
 
