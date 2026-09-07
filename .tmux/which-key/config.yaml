@@ -1,0 +1,117 @@
+# yaml-language-server: $schema=config.schema.yaml
+
+command_alias_start_index: 200
+
+# Open Which-Key with:
+#
+#   <leaderkey> Space
+#
+# No root_table binding is defined, because I do not want
+# tmux-which-key to consume Ctrl-Space globally.
+keybindings:
+  prefix_table: Space
+
+title:
+  style: align=centre,bold
+  prefix: tmux
+  prefix_style: fg=green,align=centre,bold
+
+position:
+  x: R
+  y: P
+
+custom_variables: []
+
+macros: []
+
+items:
+
+  # ------------------------------------------------------------
+  # General
+  # ------------------------------------------------------------
+
+  - name: Reload tmux configuration
+    key: r
+    command: source-file ~/.tmux.conf
+
+  - name: Copy mode
+    key: M-s
+    command: copy-mode
+
+  - name: Kill current session
+    key: C-k
+    command: kill-session
+
+  - separator: true
+
+  # ------------------------------------------------------------
+  # Windows
+  # ------------------------------------------------------------
+
+  - name: New window
+    key: c
+    command: 'new-window -c "#{pane_current_path}"'
+
+  - name: Next window
+    key: n
+    command: next-window
+
+  - name: Previous window
+    key: p
+    command: previous-window
+
+  - name: Last window
+    key: l
+    command: last-window
+
+  - separator: true
+
+  # ------------------------------------------------------------
+  # Panes
+  # ------------------------------------------------------------
+
+  - name: Split pane horizontally
+    key: h
+    command: 'split-window -v -c "#{pane_current_path}"'
+
+  - name: Split pane vertically
+    key: v
+    command: 'split-window -h -c "#{pane_current_path}"'
+
+  - name: +Move/reparent pane
+    key: j
+    menu:
+      - name: Left
+        key: l
+        command: 'run-shell "true"'
+
+      - name: Right
+        key: r
+        command: 'run-shell "true"'
+
+      - name: Above
+        key: k
+        command: 'run-shell "true"'
+
+      - name: Below
+        key: j
+        command: 'run-shell "true"'
+
+  - separator: true
+
+  # ------------------------------------------------------------
+  # tmux-resurrect
+  # ------------------------------------------------------------
+
+  - name: Save named snapshot
+    key: C-s
+    command: 'command-prompt -I "#{session_name}" -p "Save name:" "run-shell ~/.tmux/bin/tmux_named_resurrect_save.sh %1 #{?@resurrect-dir,#{@resurrect-dir},#{home}/.tmux/resurrect}"'
+
+  - name: Restore snapshot
+    key: C-r
+    command: >-
+      display-popup
+      -w 80%
+      -h 80%
+      -E
+      "~/.tmux/bin/tmux_named_resurrect_restore.sh #{?@resurrect-dir,#{@resurrect-dir},#{home}/.tmux/resurrect}"

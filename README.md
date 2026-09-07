@@ -1,4 +1,4 @@
-# MyConfig_tmux
+# myConfig_tmux
 
 ---
 
@@ -7,14 +7,23 @@
 See [INSTALL.md](INSTALL.md) for installation and initial setup.
 
 ---
+## Author
+
+**Name:** Falko ten Bosch
+**Email:** falko@tenbosch.net
+**GitHub:** https://github.com/FtenBosch/myConfig_tmux
+
+---
 
 ## What is this?
 
 Personal tmux configuration and setup scripts with:
 
+- 🧊 Nordtheme-based tmux status bar styling
 - 🪆 Nesting-level-dependent tmux leader key configurations
 - 🪟 Pane and window management shortcuts
 - 🔌 TPM-based plugin management
+- ⌨️ `tmux-which-key` popup menu for discovering configured keybindings
 - 💾 Integration of `tmux-resurrect` plugin
 - 🏷️  Named resurrect snapshots
 - 🔎 `fzf`-based snapshot restore picker
@@ -36,9 +45,11 @@ Personal tmux configuration and setup scripts with:
 ├── README.md
 ├── .tmux.conf
 └── .tmux
-    └── bin
-        ├── tmux_named_resurrect_restore.sh
-        └── tmux_named_resurrect_save.sh
+    ├── bin
+    │   ├── tmux_named_resurrect_restore.sh
+    │   └── tmux_named_resurrect_save.sh
+    └── which-key
+        └── config.yaml
 ```
 
 ---
@@ -58,6 +69,7 @@ The following tmux plugins are configured through TPM:
 * `tmux-plugins/tmux-resurrect`
 * `tmux-plugins/tmux-yank`
 * `tmux-plugins/vim-tmux-focus-events`
+* `alexwforsythe/tmux-which-key`
 * `nordtheme/tmux`
 
 There is deliberately no `tmux-sensible` dependency. This repository itself contains the personal tmux baseline configuration.
@@ -137,6 +149,7 @@ tmux-plugins/tpm
 tmux-plugins/tmux-resurrect
 tmux-plugins/tmux-yank
 tmux-plugins/vim-tmux-focus-events
+alexwforsythe/tmux-which-key
 nordtheme/tmux
 ```
 
@@ -145,6 +158,128 @@ TPM is initialized with:
 ```tmux
 run '~/.tmux/plugins/tpm/tpm'
 ```
+
+### Nordtheme
+
+The tmux status bar and window-list colors are provided by the Nord theme plugin:
+
+```text
+nordtheme/tmux
+```
+
+It is declared in `.tmux.conf` through TPM with:
+
+```tmux
+set -g @plugin 'nordtheme/tmux'
+```
+
+After adding or re-enabling the plugin, install it through TPM with:
+
+```text
+<leaderkey> I
+```
+
+Then reload the tmux configuration with:
+
+```text
+<leaderkey> r
+```
+
+The repository name of `nordtheme/tmux` is simply `tmux`, so TPM installs it under:
+
+```text
+~/.tmux/plugins/tmux
+```
+
+This is important when testing other theme repositories that are also named `tmux`, for example `catppuccin/tmux`: TPM derives the local plugin directory from the repository name, so both plugins would try to use the same `~/.tmux/plugins/tmux` directory. Do not keep both there at the same time.
+
+To verify which repository is currently installed in that directory, use:
+
+```bash
+git -C ~/.tmux/plugins/tmux remote get-url origin
+```
+
+---
+
+### tmux-which-key
+
+`tmux-which-key` provides a discoverable popup menu for the keybindings used by this configuration.
+
+Open the menu with:
+
+```text
+<leaderkey> Space
+```
+
+The Which-Key menu mirrors the important bindings from `.tmux.conf`, so the normal direct keybindings remain available. For example:
+
+```text
+<leaderkey> c       create a new window
+<leaderkey> h       split pane horizontally
+<leaderkey> v       split pane vertically
+<leaderkey> j       move/reparent the current pane
+```
+
+The same commands are documented in the Which-Key menu below `<leaderkey> Space`.
+
+The Which-Key configuration is stored in this repository at:
+
+```text
+.tmux/which-key/config.yaml
+```
+
+and is made available to the plugin through:
+
+```text
+~/.config/tmux/plugins/tmux-which-key/config.yaml
+```
+
+The generated tmux configuration is written to:
+
+```text
+~/.local/share/tmux/plugins/tmux-which-key/init.tmux
+```
+
+After changing `config.yaml`, rebuild/reload the Which-Key menu with:
+
+```bash
+~/.tmux/plugins/tmux-which-key/plugin.sh.tmux
+```
+
+#### Pane reparenting legend
+
+The `j` entry inside Which-Key is used as a legend for the existing pane-reparent workflow.
+
+Opening:
+
+```text
+<leaderkey> Space
+```
+
+and then selecting:
+
+```text
+j    +Move/reparent pane
+```
+
+shows the directional key legend:
+
+```text
+l    Left
+r    Right
+k    Above
+j    Below
+```
+
+This Which-Key submenu is documentation only. The actual pane-reparent operation is still started directly with:
+
+```text
+<leaderkey> j
+```
+
+which opens the tmux `Move pane` popup and performs the existing pane-move workflow.
+
+---
 
 ### tmux-resurrect
 
@@ -296,6 +431,7 @@ Because the files installed under `$HOME` are symbolic links into this repositor
 ```text
 .tmux.conf
 .tmux/bin/
+.tmux/which-key/config.yaml
 ```
 
 immediately become the installed configuration.

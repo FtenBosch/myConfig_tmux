@@ -40,6 +40,11 @@ else
     echo "Not touching it."
 fi
 
+echo
+echo "#############################"
+echo "2. Linking Resurrect scripts "
+echo "#############################"
+echo
 # Symlink the "resurrect" scripts into the ~/.tmux/bin directory
 dirTmuxBinTarget="$HOME/.tmux/bin"
 mkdir -p "$dirTmuxBinTarget"
@@ -74,5 +79,41 @@ for vcFileSource in "$vcRepoDir"/.tmux/bin/*; do
         echo "Not touching it."
     fi
 done
+
+echo
+echo "########################################"
+echo "3. Symlink tmux-which-key configuration "
+echo "########################################"
+echo
+# Symlink tmux-which-key configuration.
+dirWhichKeyTarget="${XDG_CONFIG_HOME:-$HOME/.config}/tmux/plugins/tmux-which-key"
+fileWhichKeySource="$vcRepoDir/.tmux/which-key/config.yaml"
+fileWhichKeyTarget="$dirWhichKeyTarget/config.yaml"
+
+mkdir -p "$dirWhichKeyTarget"
+
+if [[ ! -e "$fileWhichKeyTarget" && ! -L "$fileWhichKeyTarget" ]]; then
+    echo "Linking: $fileWhichKeyTarget -> $fileWhichKeySource"
+    ln -s "$fileWhichKeySource" "$fileWhichKeyTarget"
+
+elif [[ -L "$fileWhichKeyTarget" && ! -e "$fileWhichKeyTarget" ]]; then
+    echo "Replacing broken symlink: $fileWhichKeyTarget"
+    unlink "$fileWhichKeyTarget"
+    ln -s "$fileWhichKeySource" "$fileWhichKeyTarget"
+
+elif [[ -L "$fileWhichKeyTarget" ]]; then
+    if [[ "$(readlink -f "$fileWhichKeyTarget")" == "$(readlink -f "$fileWhichKeySource")" ]]; then
+        echo "Already correctly linked: $fileWhichKeyTarget"
+    else
+        echo "WARNING: $fileWhichKeyTarget points somewhere else:"
+        echo "  current: $(readlink "$fileWhichKeyTarget")"
+        echo "  wanted:  $fileWhichKeySource"
+    fi
+
+else
+    echo "WARNING: $fileWhichKeyTarget already exists and is not the expected symlink."
+    echo "Not touching it."
+fi
+
 
 
